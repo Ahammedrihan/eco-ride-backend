@@ -23,6 +23,7 @@ import json
 
 
 class GetRoutesView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         routes = [
             'api/token/user',
