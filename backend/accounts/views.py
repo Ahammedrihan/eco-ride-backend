@@ -22,6 +22,21 @@ import json
 
 
 
+class GetRoutesView(APIView):
+    def get(self, request):
+        routes = [
+            'api/token/user',
+            'api/token/admin',
+            'api/token/refresh/',
+            'api/token/verify/',
+            'api/user/register',
+            'api/tutor/register/'
+        ]
+
+        return Response(routes)
+
+
+
 
  
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):

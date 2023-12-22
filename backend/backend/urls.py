@@ -19,10 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path,include
 from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView)
-from accounts.views import MyTokenObtainPairView 
+from accounts.views import MyTokenObtainPairView ,GetRoutesView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', GetRoutesView.as_view()),
     path('api/admin/',include('adminapp.urls')),
     path('api/user/',include('accounts.urls')),
     path('api/driver/',include('driver.urls')),
