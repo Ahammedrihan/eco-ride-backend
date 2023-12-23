@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import UserRegistrationSerializer, UserLoginSerializer ,UserProfileSerializer,UserChangePasswordSerializer,UserSerializer,DriverSerializer
-from .serializers import AddressSerializer , AddVehicleSerializer ,BasicProfileSerializer,ProfileSerializer ,UserAllTripSerializer
+from .serializers import AddressSerializer , AddVehicleSerializer ,BasicProfileSerializer,ProfileSerializer ,UserAllTripSerializer ,VerifyAccountSerializer
 from driver.serializers import DriverProfileSerializer ,DriverBasicInfoSerializer,DriverProfileVehicleInfo ,FinishedTripsSerializer
 from rest_framework.generics import ListAPIView
 from .models import CustomUser, AccountInfo,VehicleInfo,Profile,ActiveDrivers,Trip,FinishedTrips
@@ -19,6 +19,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser
 from math import radians, cos, sin, asin, sqrt
 import json
+from .email import *
 
 
 
@@ -61,12 +62,55 @@ class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
 
     def post(self,request,format=None):
-        serializer = UserRegistrationSerializer(data=request.data)
+        copy = request.data
+        otp = ''.join(random.choices('0123456789', k=6))
+        copy['otp'] = otp
+        serializer = UserRegistrationSerializer(data=copy)
+        
         if serializer.is_valid():
             user = serializer.save()
+            set_otp_via_email(serializer.data['email'])
+
             return Response({'msg':"reg sucess"},status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+
+class VerifyOTP(APIView):
+    permission_classes = [AllowAny]
+    def post(self,request):
+        try:
+            data = request.data
+            print(data)
+            serializer = VerifyAccountSerializer(data=data)
+            if serializer.is_valid():
+                email = serializer.data['email']
+                otp = serializer.data['otp']
+                print(email)
+                hwy = CustomUser.objects.all()
+                print(hwy,"INN")
+                user = CustomUser.objects.filter(email = email)
+                print(user)
+
+                if not user.exists():
+                    return Response({"message":"invalid email"},status=status.HTTP_400_BAD_REQUEST)
+                if  user[0].otp != otp:
+                    return Response({"message":" Wrong Otp","data":serializer.data},status=status.HTTP_400_BAD_REQUEST)
+                user[0].is_active = True
+                user[0].save()
+                return Response({"message":"Account Verified"},status=status.HTTP_200_OK)
+            return Response({"message":" Something went wrong"},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(e)
+
+
+        
+
+
+
+                
+
+            
+
+
     
 class DriverRegistrationView(APIView):
     renderer_classes = [CustomUserRenderer]

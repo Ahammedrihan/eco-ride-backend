@@ -9,7 +9,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style = {'input_type':'password'},write_only = True)
     class Meta:
         model = CustomUser
-        fields = ['email','first_name','last_name','phone','password','password2']
+        fields = ['email','first_name','last_name','phone','password','password2','otp']
         extra_kwargs ={
             'password':{'write_only':True}
         }    
@@ -27,8 +27,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
 
 
+class VerifyAccountSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField()
 
-    
+
     
 
 

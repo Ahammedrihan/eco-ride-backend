@@ -35,14 +35,13 @@ class CustomUser(AbstractBaseUser):
     phone = models.CharField(max_length=15)
     last_name = models.CharField(max_length=255)
     role = models.CharField(max_length=20,choices=Role_Choices, default= "user")
-    
+    otp = models.CharField(max_length=6, blank=True, null=True) 
     is_driver = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
 
-    
 
     objects = CustomUserManager()
 
