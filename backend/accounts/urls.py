@@ -4,6 +4,8 @@ from .views import *
 urlpatterns = [
     path('register/',UserRegistrationView.as_view(),name ="register"),
     path('verify-otp/',VerifyOTP.as_view(),name ="register"),
+    path('verify-otp-fail/',OtpVerificationFailed.as_view(),name ="register"),
+  
     path('driver-register/',DriverRegistrationView.as_view(),name ="driver_register"),
     path('logout/',LogoutView.as_view(),name='logout'),
     path('profile/<int:user_id>/',UserProfileView.as_view(),name ="profile"),
@@ -21,5 +23,6 @@ urlpatterns = [
     path("user-default-address",UserDefaultAddress.as_view()),
     path("user-travel-distance/",UserFromToDestinationDistanceFinder.as_view()),
     path("trip-amount/",TripAmount.as_view()),
-    path("all-trips",UserAllTrips.as_view())
+    path("all-trips",UserAllTrips.as_view()),
+    path("active-trip/",UserActiveRideView.as_view())
 ]

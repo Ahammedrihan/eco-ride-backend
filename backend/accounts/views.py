@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import UserRegistrationSerializer, UserLoginSerializer ,UserProfileSerializer,UserChangePasswordSerializer,UserSerializer,DriverSerializer
-from .serializers import AddressSerializer , AddVehicleSerializer ,BasicProfileSerializer,ProfileSerializer ,UserAllTripSerializer ,VerifyAccountSerializer
+from .serializers import AddressSerializer , AddVehicleSerializer ,BasicProfileSerializer,ProfileSerializer ,UserAllTripSerializer ,VerifyAccountSerializer,UserActiveRideSerializer
 from driver.serializers import DriverProfileSerializer ,DriverBasicInfoSerializer,DriverProfileVehicleInfo ,FinishedTripsSerializer
 from rest_framework.generics import ListAPIView
 from .models import CustomUser, AccountInfo,VehicleInfo,Profile,ActiveDrivers,Trip,FinishedTrips
@@ -54,6 +54,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
+    
     serializer_class = MyTokenObtainPairSerializer
 
 
@@ -65,6 +66,8 @@ class UserRegistrationView(APIView):
         copy = request.data
         otp = ''.join(random.choices('0123456789', k=6))
         copy['otp'] = otp
+        copy['is_active'] = False
+        
         serializer = UserRegistrationSerializer(data=copy)
         
         if serializer.is_valid():
@@ -100,6 +103,23 @@ class VerifyOTP(APIView):
             return Response({"message":" Something went wrong"},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print(e)
+
+
+class OtpVerificationFailed(APIView):
+    permission_classes = [AllowAny]
+    def post(self,request):
+        try:
+            data = request.data
+            email = data.email
+            print(email)
+            user = CustomUser.objects.get(email = email)
+            if user :
+                user.delete()
+                return Response({"message":"User poped out of table"},status=status.HTTP_200_OK)
+            return Response({"message":"User not in table"},status=status.HTTP_200_OK)
+        except:
+            return Response({"message":"No got got from verify otp page"},status=status.HTTP_404_NOT_FOUND)
+
 
 
         
@@ -435,6 +455,20 @@ class UserAllTrips(ListAPIView):
             return Response({"message":f"An error occurred: {str(e)}"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             
+
+class UserActiveRideView(APIView):
+    
+    def get(self,request):
+        user_id = request.user.id
+        try:
+            active_ride_details = Trip.objects.get(user_id = user_id)
+
+            serializer = UserActiveRideSerializer(active_ride_details)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            return Response({"message":"No active trips for user"},status=status.HTTP_204_NO_CONTENT)
+
+
             
 
 

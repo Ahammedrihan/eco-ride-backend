@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import CustomUser ,AccountInfo ,VehicleInfo ,Profile,FinishedTrips
+from accounts.models import CustomUser ,AccountInfo ,VehicleInfo ,Profile,FinishedTrips ,Trip
 from django.contrib.auth.hashers import check_password
 from driver.serializers import DriverBasicInfoSerializer
 
@@ -30,6 +30,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class VerifyAccountSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
+
+
 
 
     
@@ -142,4 +144,9 @@ class UserAllTripSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FinishedTrips
+        fields = "__all__"
+
+class UserActiveRideSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
         fields = "__all__"
