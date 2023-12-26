@@ -114,7 +114,21 @@ class DriverAllTripSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserInfoForDriverAllTripsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields =  ["id", "email", "first_name", "phone", "last_name"]
+    
+
+class VehicleInfoForDriverAllTripsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VehicleInfo
+        fields = "__all__"
+
+
 class FinishedTripsSerializer(serializers.ModelSerializer):
+    vehicle = VehicleInfoForDriverAllTripsSerializer(read_only=True)
+    user = UserInfoForDriverAllTripsSerializer(read_only=True)
     class Meta:
         model = FinishedTrips
         fields = "__all__"

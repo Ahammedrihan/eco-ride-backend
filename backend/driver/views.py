@@ -104,6 +104,7 @@ class DriverDefaultAddressView(APIView):
             try:
                 default_driver_address = AccountInfo.objects.get(user_id = driver,default = True)
                 serializer = DriverProfileAccountInfoSerializer(default_driver_address)
+                print(serializer.data)
                 return Response(serializer.data,status=status.HTTP_200_OK)
             except AccountInfo.DoesNotExist:
                 return Response({"message":"You don't have any active  address"},status=status.HTTP_404_NOT_FOUND)

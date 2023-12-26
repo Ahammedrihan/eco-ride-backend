@@ -72,37 +72,40 @@ class UserRegistrationView(APIView):
         
         if serializer.is_valid():
             user = serializer.save()
+            user.is_active = False
+            user.save()
             set_otp_via_email(serializer.data['email'])
 
             return Response({'msg':"reg sucess"},status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
+    
+
 class VerifyOTP(APIView):
     permission_classes = [AllowAny]
-    def post(self,request):
+
+    def post(self, request):
         try:
             data = request.data
-            print(data)
-            serializer = VerifyAccountSerializer(data=data)
-            if serializer.is_valid():
-                email = serializer.data['email']
-                otp = serializer.data['otp']
-                print(email)
-                hwy = CustomUser.objects.all()
-                print(hwy,"INN")
-                user = CustomUser.objects.filter(email = email)
-                print(user)
+            email = data['email']
+            otp = data['otp']
 
-                if not user.exists():
-                    return Response({"message":"invalid email"},status=status.HTTP_400_BAD_REQUEST)
-                if  user[0].otp != otp:
-                    return Response({"message":" Wrong Otp","data":serializer.data},status=status.HTTP_400_BAD_REQUEST)
-                user[0].is_active = True
-                user[0].save()
-                return Response({"message":"Account Verified"},status=status.HTTP_200_OK)
-            return Response({"message":" Something went wrong"},status=status.HTTP_400_BAD_REQUEST)
+            try:
+                user = CustomUser.objects.get(email=email)
+            except :
+                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            if user and user.otp == otp:
+                user.is_active = True
+                user.save()
+                return Response({"message": "Account Verified"}, status=status.HTTP_200_OK)
+            else:
+                user.is_active = False
+                return Response({"message": "Wrong Otp"}, status=status.HTTP_204_NO_CONTENT)
+
         except Exception as e:
-            print(e)
+            return Response({"message": f"Something went wrong: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OtpVerificationFailed(APIView):
@@ -110,7 +113,7 @@ class OtpVerificationFailed(APIView):
     def post(self,request):
         try:
             data = request.data
-            email = data.email
+            email = data['email']
             print(email)
             user = CustomUser.objects.get(email = email)
             if user :
@@ -349,34 +352,41 @@ class FindNearByDriver(APIView):
         
                 try:
                     driver = ActiveDrivers.objects.all()
+                   
                     trip_active_drivers = Trip.objects.values_list('driver_id',flat=True)
+                    print(trip_active_drivers)
                     drivers = []
                     
                     for each_driver in driver:
-                        if each_driver.id not in trip_active_drivers:
+                        if each_driver.user_id not in trip_active_drivers :
                             drivers.append(each_driver)
-                    
                     user_driver_distance_array = []
-                    for driver in drivers:
+                   
+                    if not drivers:
+                        print("00000000000000000000")
+                        
+                        return Response(user_driver_distance_array,status=status.HTTP_204_NO_CONTENT)
+                    else:
+                        for driver in drivers:
 
-                        driver_basic_details = CustomUser.objects.get(id = driver.user_id)
-                        basic_info_serializer = DriverBasicInfoSerializer(driver_basic_details)
-                        driver_basic = basic_info_serializer.data
-                        driver_vehicle = VehicleInfo.objects.get(id = driver.active_vehicle_id)
-                        serializer = DriverProfileVehicleInfo(driver_vehicle)
-                        vehicle = serializer.data
-                    
-                        a = self.find_distance(user_lat,user_long,driver.latitude,driver.longitude)
-                        b = {
-                            "driver_id" : driver.id,
-                            "distance": round(a,2),
-                            "latitude": driver.latitude,
-                            "longitude": driver.longitude,
-                            "driver_vehicle":vehicle,
-                            "driver_basic":driver_basic
-                        }
-                        user_driver_distance_array.append(b)
-                    return Response(user_driver_distance_array,status=status.HTTP_200_OK)
+                            driver_basic_details = CustomUser.objects.get(id = driver.user_id)
+                            basic_info_serializer = DriverBasicInfoSerializer(driver_basic_details)
+                            driver_basic = basic_info_serializer.data
+                            driver_vehicle = VehicleInfo.objects.get(id = driver.active_vehicle_id)
+                            serializer = DriverProfileVehicleInfo(driver_vehicle)
+                            vehicle = serializer.data
+                        
+                            a = self.find_distance(user_lat,user_long,driver.latitude,driver.longitude)
+                            b = {
+                                "driver_id" : driver.id,
+                                "distance": round(a,2),
+                                "latitude": driver.latitude,
+                                "longitude": driver.longitude,
+                                "driver_vehicle":vehicle,
+                                "driver_basic":driver_basic
+                            }
+                            user_driver_distance_array.append(b)
+                        return Response(user_driver_distance_array,status=status.HTTP_200_OK)
                 except :
                     return Response({"message":"driver address Not Found"},status=status.HTTP_404_NOT_FOUND)
             except:

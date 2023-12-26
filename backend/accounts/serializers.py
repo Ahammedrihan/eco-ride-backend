@@ -133,6 +133,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         exclude = ['profile_image']
 
+
+
+# <====================== USER ALL TRIP WITH DRIVERINFO, VEHICLE INFO, FINISHED TRIP INFO ===================>
 class UseAllTripVehicleInfo(serializers.ModelSerializer):
     class Meta:
         model = VehicleInfo
@@ -141,10 +144,11 @@ class UseAllTripVehicleInfo(serializers.ModelSerializer):
 class UserAllTripSerializer(serializers.ModelSerializer):
     vehicle = UseAllTripVehicleInfo( read_only=True)  
     driver = DriverBasicInfoSerializer(read_only=True)
-
     class Meta:
         model = FinishedTrips
         fields = "__all__"
+
+# <====================== USER ACTIVE TRIP WITH TRIP INFO ===================>
 
 class UserActiveRideSerializer(serializers.ModelSerializer):
     class Meta:
