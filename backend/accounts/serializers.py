@@ -154,3 +154,16 @@ class UserActiveRideSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
         fields = "__all__"
+
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['gender','age','alternate_phone']
+
+class userUpdateserializer(serializers.ModelSerializer):
+    # profile_user = ProfileUpdateSerializer(source='profile_info')
+
+    class Meta:
+        model = CustomUser
+        fields = ['first_name','phone','last_name']

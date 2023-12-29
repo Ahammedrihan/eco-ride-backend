@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializers import UserRegistrationSerializer, UserLoginSerializer ,UserProfileSerializer,UserChangePasswordSerializer,UserSerializer,DriverSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer ,UserProfileSerializer,UserChangePasswordSerializer,UserSerializer,DriverSerializer,userUpdateserializer
 from .serializers import AddressSerializer , AddVehicleSerializer ,BasicProfileSerializer,ProfileSerializer ,UserAllTripSerializer ,VerifyAccountSerializer,UserActiveRideSerializer
 from driver.serializers import DriverProfileSerializer ,DriverBasicInfoSerializer,DriverProfileVehicleInfo ,FinishedTripsSerializer
 from rest_framework.generics import ListAPIView
@@ -54,7 +54,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
-    
+    permission_classes = [AllowAny]
     serializer_class = MyTokenObtainPairSerializer
 
 
@@ -160,6 +160,19 @@ class UserProfileView(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"error": "user not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class UserProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        user = self.request.user
+        serializer = userUpdateserializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserChangePasswordView(APIView):

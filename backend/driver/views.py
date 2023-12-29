@@ -116,7 +116,7 @@ class DriverDefaultAddressView(APIView):
 class ActiveDriverView(APIView):
     permission_classes = [IsAuthenticated]
     def post (self,request):
-
+        
         driver_present = ActiveDrivers.objects.filter(user_id =request.user.id )
         if driver_present:
             return Response({"message":"Driver Already active"},status=status.HTTP_204_NO_CONTENT)
@@ -222,50 +222,42 @@ class DriverSideTripStatusButton(APIView):
 
 
 class FinishRide(APIView):
-    def post(self,request):
+      def post(self,request):
         driver_id = request.user.id
         try:
             active_trip = Trip.objects.get(driver_id = driver_id)
-            try:
-                if active_trip.trip_status == "finished":
-                    active_trip.payment_status = True
-                    active_trip.save()
-                    try:
-                        serializer = FinishedTripsSerializer(data = {
-                            'user' : active_trip.user.pk,
-                            'driver' :active_trip.driver.pk,
-                            'vehicle':active_trip.vehicle.pk,
-                            'start_lat':active_trip.start_lat,
-                            'start_long':active_trip.start_long,
-                            'end_lat':active_trip.end_lat,
-                            'end_long':active_trip.end_long,
-                            'start_location_name':active_trip.start_location_name,
-                            'end_location_name':active_trip.end_location_name,
-                            'created_at':active_trip.created_at,
-                            'amount':active_trip.amount,
-                            'payment_method':active_trip.payment_method,
-                            'razorpay_order_id':active_trip.razorpay_order_id,
-                            'razorpay_payment_id':active_trip.razorpay_payment_id,
-                            'total_distance':active_trip.total_distance,
-                            'payment_status':active_trip.payment_status,
-                            'Trip_end_time':timezone.now()
-                        } )
-                        print(serializer.is_valid())
-                        if serializer.is_valid():
-                            serializer.save()
-                            active_trip.delete()
-                            return Response({"message":"data added to finished trip table","data":serializer.data},status=status.HTTP_200_OK)
-                        else:
-                            print(serializer.errors,"!!!!!!!!!!!!!!")
-                            return Response({"message": "Trip status is not finished or payment status is already True","error":serializer.errors}, status=status.HTTP_304_NOT_MODIFIED)
-                    except:
-                        return Response({"message":"Data not able to interchange"},status=status.HTTP_400_BAD_REQUEST)
 
-            except:
-                return Response({"message":"trip status is not finished"},status=status.HTTP_304_NOT_MODIFIED)
-        except:
-            return Response({"message":"No such active tips found"},status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        
+            if active_trip.trip_status == active_trip.TripStatus.finished:
+                finished_trip = FinishedTrips.objects.create(
+                      user=active_trip.user,
+                    driver=active_trip.driver,
+                    vehicle=active_trip.vehicle,
+                    start_lat=active_trip.start_lat,
+                    start_long=active_trip.start_long,
+                    end_lat=active_trip.end_lat,
+                    end_long=active_trip.end_long,
+                    start_location_name=active_trip.start_location_name,
+                    end_location_name=active_trip.end_location_name,
+                    created_at=active_trip.created_at,
+                    amount=active_trip.amount,
+                    payment_method=active_trip.payment_method,
+                    razorpay_order_id=active_trip.razorpay_order_id,
+                    razorpay_payment_id=active_trip.razorpay_payment_id,
+                    total_distance=active_trip.total_distance,
+                    payment_status=active_trip.payment_status,
+                    Trip_end_time=timezone.now()
+                )
+                
+                finished_trip.save()
+                active_trip.delete()
+                return Response({"message": "Trip finished successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Trip not finished "}, status=status.HTTP_204_NO_CONTENT)
+        except Trip.DoesNotExist:
+            return Response({"message": "No active trips found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
     
     
 class DriverProfileAllTripsView(APIView):

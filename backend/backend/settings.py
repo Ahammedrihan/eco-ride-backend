@@ -144,6 +144,7 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 REST_FRAMEWORK = {
@@ -205,9 +206,9 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
   
-    # "http://localhost:3000",
-    # "http://127.0.0.1:3000",
-    "https://www.eco-ride.online"
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    # "https://www.eco-ride.online"
 ]
 
 

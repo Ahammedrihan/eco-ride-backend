@@ -5,10 +5,10 @@ urlpatterns = [
     path('register/',UserRegistrationView.as_view(),name ="register"),
     path('verify-otp/',VerifyOTP.as_view(),name ="register"),
     path('verify-otp-fail/',OtpVerificationFailed.as_view(),name ="register"),
-
     path('driver-register/',DriverRegistrationView.as_view(),name ="driver_register"),
     path('logout/',LogoutView.as_view(),name='logout'),
     path('profile/<int:user_id>/',UserProfileView.as_view(),name ="profile"),
+    path('update-profile/',UserProfileUpdateView.as_view(),name ="profile"),
     path('reset-password/',UserChangePasswordView.as_view(),name ="reset-password"),
     path('get-users/', UserListView.as_view(), name='users-list'),
     path('user-logout/', LogoutView.as_view(), name='users-list'),

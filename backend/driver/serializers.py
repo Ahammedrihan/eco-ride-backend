@@ -93,7 +93,6 @@ class DriverProfileSerializer(serializers.ModelSerializer):
         fields = ['id','email','first_name','phone','last_name', "vehicle_info", "account_info","profile_info"]
 
 
-# class NearByDriverSerializer(serializers.Serializer):
 
 
  
@@ -129,6 +128,7 @@ class VehicleInfoForDriverAllTripsSerializer(serializers.ModelSerializer):
 class FinishedTripsSerializer(serializers.ModelSerializer):
     vehicle = VehicleInfoForDriverAllTripsSerializer(read_only=True)
     user = UserInfoForDriverAllTripsSerializer(read_only=True)
+    driver = DriverAllTripSerializer(read_only=True)
     class Meta:
         model = FinishedTrips
         fields = "__all__"
