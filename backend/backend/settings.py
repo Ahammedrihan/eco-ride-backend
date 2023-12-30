@@ -32,7 +32,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -206,9 +206,9 @@ SIMPLE_JWT = {
 
 CORS_ALLOWED_ORIGINS = [
   
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    # "https://www.eco-ride.online"
+    # "http://localhost:3000",
+    # "http://127.0.0.1:3000",
+    "https://www.eco-ride.online"
 ]
 
 
