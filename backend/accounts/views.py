@@ -242,11 +242,12 @@ class UserBlock(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post (self,request):
         try:
             refresh_token=request.data["refresh_token"]
+            print(refresh_token)
             token=RefreshToken(refresh_token)
             token.blacklist()
             return Response({"message":"refresh token blaclisted"},status=status.HTTP_205_RESET_CONTENT)
@@ -399,6 +400,7 @@ class FindNearByDriver(APIView):
                                 "driver_basic":driver_basic
                             }
                             user_driver_distance_array.append(b)
+                            print(user_driver_distance_array)
                         return Response(user_driver_distance_array,status=status.HTTP_200_OK)
                 except :
                     return Response({"message":"driver address Not Found"},status=status.HTTP_404_NOT_FOUND)

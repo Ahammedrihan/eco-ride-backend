@@ -204,10 +204,8 @@ class DriverSideTripStatusButton(APIView):
         try:
             active_trip = Trip.objects.get(driver_id = driver_id)
             try:
+                
                 if active_trip.trip_status == "pending":
-                    active_trip.trip_status = "accepted"
-                    active_trip.save()
-                elif active_trip.trip_status == "accepted":
                     active_trip.trip_status = "started"
                     active_trip.save()
                 elif active_trip.trip_status == "started":
@@ -264,10 +262,17 @@ class DriverProfileAllTripsView(APIView):
   
     def get(self,request):
         driver_id = request.user.id 
+        print(driver_id)
         try:
             driver_trips = FinishedTrips.objects.filter(driver_id = driver_id)
-            serializer = FinishedTripsSerializer(driver_trips, many=True)
-            return Response(serializer.data,status=status.HTTP_200_OK)
+            print(driver_trips)
+            if driver_trips.exists():
+                serializer = FinishedTripsSerializer(driver_trips, many=True)
+                print(serializer.is_valid())
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            else:
+                return Response({"message":"Driver has no trip status 204"},status=status.HTTP_204_NO_CONTENT)
+
         except:
             return Response({"message":"Driver has no trip details"},status=status.HTTP_204_NO_CONTENT)
 

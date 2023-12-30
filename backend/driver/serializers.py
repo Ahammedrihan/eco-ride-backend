@@ -127,7 +127,6 @@ class VehicleInfoForDriverAllTripsSerializer(serializers.ModelSerializer):
 
 class FinishedTripsSerializer(serializers.ModelSerializer):
     vehicle = VehicleInfoForDriverAllTripsSerializer(read_only=True)
-    user = UserInfoForDriverAllTripsSerializer(read_only=True)
     driver = DriverAllTripSerializer(read_only=True)
     class Meta:
         model = FinishedTrips

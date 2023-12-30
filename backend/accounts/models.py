@@ -136,7 +136,6 @@ class Trip(models.Model):
 
     class TripStatus(models.TextChoices):
         Pending = 'pending', 'Pending'
-        Accepted = 'accepted','Accepted'
         Started = 'started','Started'
         finished = 'finished','Finished'
 
